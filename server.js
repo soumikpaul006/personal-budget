@@ -1,11 +1,67 @@
 const express=require('express');
 const cors=require('cors');
 const app=express();
+const mongoose=require("mongoose");
+const Schema = mongoose.Schema;
 const fs=require("fs");
 const port=3000;
 
-
+app.use(express.json());
 app.use(cors());
+
+// DB Connection
+mongoose.connect("mongodb://localhost:27017/test_dbs", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+  .then(() => {
+    console.log("Connected to the database");
+  })
+  .catch((err) => {
+    console.log("Connection to the database failed:", err);
+});
+
+
+// SCHEMA
+const sch = new Schema({
+    title: String,
+    budget: Number,
+    color: String
+}, {
+    versionKey: false,
+    strict: 'throw'
+});
+
+const monmodel=mongoose.model("test_collection",sch);
+
+//POST
+app.use("/post",async(req,res)=>{
+    console.log("inside post function");
+
+    const data=new monmodel({
+        title:req.body.title,
+        budget:req.body.budget,
+        color:req.body.color
+    });
+
+    const val=await data.save();
+    res.json(val);
+})
+
+// Fetch all data
+app.get('/fetchall', (req, res) => {
+    monmodel.find()
+        .then((data) => {
+            res.json(data);
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(500).send('An error occurred while fetching data.');
+        });
+});
+
+
+
 
 // app.use('/', express.static('public'));
 

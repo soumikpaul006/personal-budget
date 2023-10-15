@@ -157,7 +157,10 @@
     <script src="d3chart.js"></script>
 
     <script>
-        var dataSource = {
+
+        
+        //Fetching data from data.json file
+        /*var dataSource = {
             datasets: [{
                 data: [],
                 
@@ -188,6 +191,7 @@
                 data: dataSource
             });
         }
+        
 
         function getBudget(){
             axios.get('http://localhost:3000/budget').then(function (res) {
@@ -200,7 +204,66 @@
                 createChart();
             });
         }
-        getBudget();
+
+
+        function getBudget(){
+            axios.get('http://localhost:3000/fetchall').then(function (res) {
+                console.log(res);
+                for(let i=0;i<res.data.length;i++)
+                {
+                    dataSource.datasets[0].data[i]=res.data.budget;
+                    dataSource.labels[i]=res.data.title;
+                    dataSource.datasets[1].backgroundColor[i]=res.data.color;
+                }
+                createChart();
+            });
+        }
+        getBudget();*/
+
+
+        //Fetching data from mongodb 
+
+        var dataSource = {
+            datasets: [
+              {
+                data: [],
+                backgroundColor: [],
+              },
+            ],
+          
+            // These labels appear in the legend and in the tooltips when hovering different arcs
+            labels: [],
+          };
+          
+          function createChart() {
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var myPieChart = new Chart(ctx, {
+              type: 'pie',
+              data: dataSource,
+            });
+          }
+          
+          function getBudget() {
+            axios.get('http://localhost:3000/fetchall').then(function (res) {
+              console.log(res.data);
+          
+              // Clear existing data
+              dataSource.datasets[0].data = [];
+              dataSource.labels = [];
+              dataSource.datasets[0].backgroundColor = [];
+          
+              for (let i = 0; i < res.data.length; i++) {
+                dataSource.datasets[0].data.push(res.data[i].budget);
+                dataSource.labels.push(res.data[i].title);
+                dataSource.datasets[0].backgroundColor.push(res.data[i].color);
+              }
+          
+              createChart();
+            });
+          }
+          
+          getBudget();
+          
 
     </script>
 </body>
